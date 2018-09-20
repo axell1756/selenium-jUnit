@@ -10,7 +10,7 @@ import com.google.common.io.Files;
 
 public class Helpers {
 
-	public String takeScreenshot(WebDriver webdriver, String path) throws Exception {
+	public static String takeScreenshot(WebDriver webdriver, String path) throws Exception {
 
 		// Convert web driver object to TakeScreenshot
 

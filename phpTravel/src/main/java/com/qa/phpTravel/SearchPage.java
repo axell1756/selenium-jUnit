@@ -34,7 +34,7 @@ public class SearchPage
 	@FindBy(id = "travellersInput")
 	private WebElement guests;
 	
-	public void bookHotel(WebDriver driver, String loc, String arrive, String leave, String g) {
+	public void searchForHotel(WebDriver driver, String loc, String arrive, String leave, String g) throws Exception {
 		
 		//Input location
 		Actions action = new Actions(driver);
@@ -61,6 +61,7 @@ public class SearchPage
 		
 		//Search for criteria 
 		action.sendKeys(Keys.TAB).perform();
+		Helpers.takeScreenshot(driver, Constants.SCREENSHOT_PATH + "searchQuery.png");
 		action.sendKeys(Keys.ENTER).perform();
 
 		

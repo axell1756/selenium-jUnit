@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,7 +23,7 @@ import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
 
-public class SearchBarTest {
+public class HotelBookingTest {
 
 	private WebDriver driver;
 
@@ -34,7 +35,7 @@ public class SearchBarTest {
 
 	@BeforeClass
 	public static void initial() {
-		report = new ExtentReports(Constants.REPORT_PATH + "searchBarTest.html", true);
+		report = new ExtentReports(Constants.REPORT_PATH + "hotelBookingTest.html", true);
 
 		try {
 			file = new FileInputStream(Constants.TDD_PATH + Constants.TDD_FILE);
@@ -58,41 +59,29 @@ public class SearchBarTest {
 		driver.manage().window().maximize();
 
 	}
-
+	
 	@Test
-	public void searchBarTest() throws Exception {
+	public void bookHotel() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		XSSFSheet searchQuery = workbook.getSheetAt(1);
+		XSSFCell out = searchQuery.getRow(1).getCell(0);
+		XSSFCell a = searchQuery.getRow(1).getCell(1);
+		XSSFCell c = searchQuery.getRow(1).getCell(2);
 		
-		XSSFSheet searchQuery = workbook.getSheetAt(0);
-		XSSFCell city = searchQuery.getRow(1).getCell(0);
-		XSSFCell dateIn = searchQuery.getRow(1).getCell(1);
-		XSSFCell dateOut = searchQuery.getRow(1).getCell(2);
-		XSSFCell guests = searchQuery.getRow(1).getCell(3);
+		test = report.startTest("Book Hotel");
+
+		driver.get(Constants.LONDON_HOTEL_URL);
+		test.log(LogStatus.INFO, "Page with Hotel in London opened");
 		
+		HotelBookingPage booking = PageFactory.initElements(driver, HotelBookingPage.class);
 		
-		test = report.startTest("Search for Hotel");
-
-		driver.get(Constants.INDEX_URL);
-		test.log(LogStatus.INFO, "Page opened");
-
-		SearchPage search = PageFactory.initElements(driver, SearchPage.class);
-		search.searchForHotel(driver, city.getStringCellValue(), dateIn.toString(), dateOut.toString(), guests.getStringCellValue());
-
-		test.log(LogStatus.INFO, "Search query" + test.addScreenCapture(Constants.SCREENSHOT_PATH + "searchQuery.png"));
-
-		SearchResult result = PageFactory.initElements(driver, SearchResult.class);
-
-		if (result.results.size() > 0) {
-			test.log(LogStatus.PASS, "Search successfull"
-					+ test.addScreenCapture(Helpers.takeScreenshot(driver, Constants.SCREENSHOT_PATH + "result.png")));
-		} else {
-			test.log(LogStatus.FAIL, "Search unsuccessfull"
-					+ test.addScreenCapture(Helpers.takeScreenshot(driver, Constants.SCREENSHOT_PATH + "result.png")));
-		}
-
-		assertTrue("Search doesn't work", result.results.size() > 0);
-		report.endTest(test);
+		String checkOut = format.format(out.getDateCellValue());
+		booking.bookHotel(driver, checkOut, a.getNumericCellValue(), c.getNumericCellValue());
+		
+		Thread.sleep(30000);
+		
 	}
-
+	
 	@After
 	public void tearDown() {
 		driver.quit();
